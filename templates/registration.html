@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block title %}Register | Robotiators{% endblock %}
+
+{% block content %}
+    <h1>Student Registration</h1>
+
+    {% if message %}
+        <div class="alert {% if success %}alert-success{% else %}alert-error{% endif %}">
+            {{ message }}
+        </div>
+    {% endif %}
+
+    <div class="card" style="max-width: 400px; margin: 0 auto;">
+        <form method="POST">
+            <label for="username"><strong>Full Name:</strong></label>
+            <input 
+                type="text" 
+                id="username" 
+                name="username" 
+                placeholder="Enter your first and last name" 
+                required
+                style="margin-top: 5px; margin-bottom: 15px;"
+            >
+
+            <label for="pin"><strong>Choose a PIN:</strong></label>
+            <input 
+                type="password" 
+                id="pin" 
+                name="pin" 
+                placeholder="At least 4 digits (numbers only)" 
+                required
+                style="margin-top: 5px; margin-bottom: 20px;"
+            >
+
+            <input type="submit" value="Register Account" style="width: 100%; font-size: 1.1em; padding: 10px;">
+        </form>
+    </div>
+
+    <div style="text-align: center; margin-top: 20px;">
+        <p>Already have an account? <a href="/logging">Check in/out here</a></p>
+    </div>
+{% endblock %}

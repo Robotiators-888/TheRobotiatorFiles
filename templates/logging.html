@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}Check In/Out | Robotiators{% endblock %}
+
+{% block content %}
+    <h1>Check In / Out</h1>
+
+    {% if message %}
+        <div class="alert {% if success %}alert-success{% else %}alert-error{% endif %}">
+            {{ message }}
+        </div>
+    {% endif %}
+
+    <div class="card" style="max-width: 400px; margin: 0 auto;">
+        <form method="POST">
+            <label for="pin"><strong>Enter Your PIN:</strong></label>
+            <input 
+                type="password" 
+                id="pin" 
+                name="pin" 
+                placeholder="4+ digit PIN" 
+                required 
+                autofocus
+                style="font-size: 1.5em; text-align: center; margin-top: 10px; margin-bottom: 20px;"
+            >
+            <input type="submit" value="Log In / Out" style="width: 100%; font-size: 1.2em; padding: 12px;">
+        </form>
+    </div>
+
+    <div style="text-align: center; margin-top: 20px;">
+        <p>Don't have a PIN yet? <a href="/registration">Register here</a></p>
+    </div>
+{% endblock %}

@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Robotiators Portal</h1>
+    
+    <div class="card" style="display: flex; gap: 20px; justify-content: space-around; flex-wrap: wrap;">
+        <div>
+            <strong>Current Season:</strong> <span id="stat-season">{{ stats.current_season }}</span>
+        </div>
+        <div>
+            <strong>Total Season Hours:</strong> <span id="stat-hours">{{ "%.2f"|format(stats.total_hours) }}</span>
+        </div>
+        <div>
+            <strong>Gerstner Hours:</strong> <span id="stat-gerstner">{{ "%.2f"|format(stats.gerstner_hours) }}</span>
+        </div>
+        <div>
+            <strong>Students in Shop:</strong> <span id="stat-people">{{ stats.total_people_in_shop }}</span>
+        </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 20px;">
+        <!-- Leaderboard -->
+        <div>
+            <h2>Leaderboard</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Rank</th>
+                        <th>Name</th>
+                        <th>Status</th>
+                        <th>Hours</th>
+                    </tr>
+                </thead>
+                <tbody id="leaderboard-body">
+                    {% for entry in leaderboard %}
+                    {% if entry.activated %}
+                    <tr>
+                        <td>{{ loop.index }}</td>
+                        <td>{{ entry.username }}</td>
+                        <td>{{ "In Shop" if entry.logged_in else "Away" }}</td>
+                        <td>{{ "%.2f"|format(entry.total_hours) }}</td>
+                    </tr>
+                    {% endif %}
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Checked In List -->
+        <div>
+            <h2>Checked In Now</h2>
+            <ul id="active-list" style="list-style-type: square; padding-left: 20px;">
+                {% for user in stats.logged_in_users %}
+                <li>
+                    <strong>{{ user.username }}</strong> <span style="font-size: 0.85em; color: #888;">(In at {{ user.login_time.split(' ')[1] }})</span>
+                </li>
+                {% else %}
+                <li style="color: #888; list-style-type: none;">No one is checked in.</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        window.onStateUpdate.push(function(data) {
+            document.getElementById('stat-season').innerText = data.stats.current_season;
+            document.getElementById('stat-hours').innerText = parseFloat(data.stats.total_hours).toFixed(2);
+            document.getElementById('stat-gerstner').innerText = parseFloat(data.stats.gerstner_hours).toFixed(2);
+            document.getElementById('stat-people').innerText = data.stats.total_people_in_shop;
+
+            // Update Leaderboard
+            const tbody = document.getElementById('leaderboard-body');
+            tbody.innerHTML = '';
+            let idx = 0;
+            data.leaderboard.forEach(entry => {
+                if (!entry.activated) return;
+                idx++;
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${idx}</td>
+                    <td>${entry.username}</td>
+                    <td>${entry.logged_in ? "In Shop" : "Away"}</td>
+                    <td>${parseFloat(entry.total_hours).toFixed(2)}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            // Update Checked In List
+            const activeList = document.getElementById('active-list');
+            activeList.innerHTML = '';
+            if (data.stats.logged_in_users.length > 0) {
+                data.stats.logged_in_users.forEach(user => {
+                    const li = document.createElement('li');
+                    const timeOnly = user.login_time.split(' ')[1];
+                    li.innerHTML = `<strong>${user.username}</strong> <span style="font-size: 0.85em; color: #888;">(In at ${timeOnly})</span>`;
+                    activeList.appendChild(li);
+                });
+            } else {
+                activeList.innerHTML = '<li style="color: #888; list-style-type: none;">No one is checked in.</li>';
+            }
+        });
+    </script>
+{% endblock %}
